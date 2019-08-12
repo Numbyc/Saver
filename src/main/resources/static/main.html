@@ -1,0 +1,57 @@
+<html lang="en">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+<dev id="consume">
+    type: <input type="text" v-model="ctype">
+    amount: <input type="text" v-model="camount">
+    <button  value="submit" onclick="addConsume()"></button>
+</dev>
+<div id="source">
+    <table v-for="consume in consumes">
+        <tr>
+            <td>{{consume.consumeType}}</td>
+            <td>{{consume.consumeAmount}}</td>
+            <td><button onclick="deleteConsume(consume.consumeId)">delete</button></td>
+        </tr>
+    </table>
+</div>
+
+<script type="application/javascript">
+    var table = new Vue({
+        el: '#source',
+        data() {
+            return {
+                consumes: null
+            }
+        },
+        mounted() {
+            axios.get('http://127.0.0.1:8080/get')
+                .then(response => (this.consumes = response.data))
+        }
+    });
+
+    var consume = new Vue({
+        el: '#consume',
+        data: {
+            ctype: "",
+            camount: ""
+        }
+    })
+
+    function listConsumes() {
+        axios.get('http://127.0.0.1:8080/')
+            .then(response => (table.consumes = response.data))
+    }
+
+    function addConsume() {
+        axios.post('http://127.0.0.1:8080/', {
+            consumeType: consume.ctype,
+            consumeAmount: consume.camount
+        }).then(listConsumes)
+    }
+
+    function deleteConsume(id) {
+        axios.post('http://127.0.0.1:8080/'+ id, {}).then(listConsumes)
+    }
+</script>
+</html>
